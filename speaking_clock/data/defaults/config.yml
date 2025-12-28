@@ -1,0 +1,33 @@
+##################################################################################
+#
+# ▄▀▀▄                █     ▀                ▄▀▀▄ ▀█            █
+# ▀▄▄  █▀▀▄ ▄▀▀▄ ▄▀▀▄ █ ▄▀ ▀█  █▀▀▄ ▄▀▀█     █     █  ▄▀▀▄ ▄▀▀▄ █ ▄▀
+#    █ █  █ █▀▀   ▄▄█ █▀▄   █  █  █ █  █     █     █  █  █ █    █▀▄
+# ▀▄▄▀ █▄▄▀ ▀▄▄▀ ▀▄▄▀ █  █ ▄█▄ █  █ ▀▄▄█     ▀▄▄▀ ▄█▄ ▀▄▄▀ ▀▄▄▀ █  █
+#      █                             ▄▄▀
+#
+# @project   Speaking Clock - time announcer using ElevenLabs TTS API
+# @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
+# @copyright 2025 Marcin Orlowski
+# @license   https://www.opensource.org/licenses/mit-license.php MIT
+# @link      https://github.com/MarcinOrlowski/speaking-clock
+#
+##################################################################################
+
+language:
+  code: "pl"
+  use_24h_clock: true
+
+elevenlabs:
+  api_key: ""  # Your ElevenLabs API key
+  voice_id: "Bratanek"  # Replace with a valid voice ID from your ElevenLabs account
+  model_id: "eleven_multilingual_v2"
+
+audio:
+  play_chime: true  # Set to true to play a chime before speaking the time
+  chime_file: "clock-chime.mp3"  # Path to the chime audio file
+  overlay_speech: true  # Set to true to overlay speech over the chime
+  speech_offset_ms: 1000  # Milliseconds to wait before starting speech after chime starts
+
+cache:
+  directory: ".cache"  # Directory for caching audio files

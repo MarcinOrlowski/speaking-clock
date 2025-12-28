@@ -1,0 +1,71 @@
+##################################################################################
+#
+# ▄▀▀▄                █     ▀                ▄▀▀▄ ▀█            █
+# ▀▄▄  █▀▀▄ ▄▀▀▄ ▄▀▀▄ █ ▄▀ ▀█  █▀▀▄ ▄▀▀█     █     █  ▄▀▀▄ ▄▀▀▄ █ ▄▀
+#    █ █  █ █▀▀   ▄▄█ █▀▄   █  █  █ █  █     █     █  █  █ █    █▀▄
+# ▀▄▄▀ █▄▄▀ ▀▄▄▀ ▀▄▄▀ █  █ ▄█▄ █  █ ▀▄▄█     ▀▄▄▀ ▄█▄ ▀▄▄▀ ▀▄▄▀ █  █
+#      █                             ▄▄▀
+#
+# @project   Speaking Clock - time announcer using ElevenLabs TTS API
+# @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
+# @copyright 2025 Marcin Orlowski
+# @license   https://www.opensource.org/licenses/mit-license.php MIT
+# @link      https://github.com/MarcinOrlowski/speaking-clock
+#
+##################################################################################
+
+# Polish language configuration for speaking clock
+
+days_of_week:
+  - "poniedziałek"  # Monday
+  - "wtorek"        # Tuesday
+  - "środa"         # Wednesday
+  - "czwartek"      # Thursday
+  - "piątek"        # Friday
+  - "sobota"        # Saturday
+  - "niedziela"     # Sunday
+
+# You can use the following placeholders in time templates:
+# {hours}        - will be replaced with hour string
+# {minutes}      - will be replaced with minutes string
+# {day_name}     - will be replaced with day of week name
+#
+hours:
+  0: "{minutes} po północy"
+  1: "pierwsza"
+  2: "druga"
+  3: "trzecia"
+  4: "czwarta"
+  5: "piąta"
+  6: "szósta"
+  7: "siódma"
+  8: "usma"          # Intentional typo for better pronunciation
+  9: "dziewiąta"
+  10: "dziesiąta"
+  11: "jedenasta"
+  12: "dwunasta"
+  13: "trzynasta"
+  14: "czternasta"
+  15: "piętnasta"
+  16: "szesnasta"
+  17: "siedemnasta"
+  18: "osiemnasta"
+  19: "dziewiętnasta"
+  20: "dwudziesta"
+  21: "dwudziesta pierwsza"
+  22: "dwudziesta druga"
+  23: "dwudziesta trzecia"
+
+special_minutes:
+  0: ""            # Silence
+  2: "dwie"
+  15: "piętnaście"
+  22: "dwadzieścia dwie"
+  30: "trzydzieści"
+  33: "trzydzieści dwie"
+  44: "czterdzieści dwie"
+  45: "czterdzieści pięć"
+  55: "pięćdziesiąt dwie"
+
+special_times:
+  midnight: "Wybiła pułnoc. Jest {day_name}"   # Intentional typo for better pronunciation

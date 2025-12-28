@@ -1,0 +1,22 @@
+language:
+  code: "pl"
+  use_24h_clock: true
+
+elevenlabs:
+  api_key: "sk_badad783b11f116fa98c0b3522c5db31e081a9cb8dea9f93"  # Your ElevenLabs API key
+  voice_id: "Bratanek"   # Replace with a valid voice ID from your ElevenLabs account
+  model_id: "eleven_multilingual_v2"
+
+audio:
+  overlay_speech: true  # Set to true to overlay speech over the chime
+  speech_offset_ms: 1000  # Milliseconds to wait before starting speech after chime starts
+  volume: 1.0  # Volume level from 0.0 to 1.0
+
+chime:
+  enabled: true  # Set to true to play a chime before speaking the time
+  audio_file: "clock-chime.mp3"  # Path to the chime audio file
+
+cache:
+  # Using the default location ~/.cache/SpeakingClock
+  # Uncomment the line below to override
+  # directory: "~/.cache/SpeakingClock"
