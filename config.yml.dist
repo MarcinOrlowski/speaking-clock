@@ -1,0 +1,17 @@
+language:
+  code: "pl"
+  use_24h_clock: true
+
+elevenlabs:
+  api_key: "<YOUR API KEY>"  # Your ElevenLabs API key
+  voice_id: "<VOICE NAME OR ID>"   # Replace with a valid voice ID from your ElevenLabs account
+  model_id: "eleven_multilingual_v2"
+
+audio:
+  overlay_speech: true  # Set to true to overlay speech over the chime. If false, speech will start after the chime ends
+  speech_offset_ms: 1000  # Milliseconds to wait before starting speech after chime starts
+  volume: 1.0  # Volume level from 0.0 to 1.0
+
+chime:
+  enabled: true  # Set to true to play a chime before speaking the time
+  audio_file: "clock-chime.mp3"  # Path to the chime audio file

@@ -1,0 +1,5 @@
+elevenlabs>=1.0.0
+PyYAML~=6.0.1
+python-dateutil~=2.8.2
+num2words~=0.5.12
+pydub>=0.25.1

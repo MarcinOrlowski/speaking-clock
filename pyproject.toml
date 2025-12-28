@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "speaking-clock"
+version = "1.0.0"
+description = "A clock that speaks the current time using ElevenLabs API"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}
+authors = [
+    {name = "Marcin Orlowski", email = "mail@marcinorlowski.com"}
+]
+dependencies = [
+    "elevenlabs",
+    "PyYAML",
+    "python-dateutil",
+    "num2words",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+speaking-clock = "speaking_clock.cli:main"
+speak-time = "speaking_clock.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["speaking_clock", "speaking_clock.*"]
+
+[tool.setuptools.package-data]
+speaking_clock = ["data/*.mp3", "data/defaults/*.yml", "languages/*.yml"]
