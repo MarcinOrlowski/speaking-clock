@@ -2,6 +2,7 @@
 
 ## v1.2.0 (TBD)
 
+- Errors from voices are no longer printed unless at no voice yields any audio.
 - Updated documentation.
 
 ## v1.1.0 (2026-07-26)

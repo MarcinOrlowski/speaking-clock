@@ -22,7 +22,7 @@ import sys
 import threading
 import time
 from pathlib import Path
-from typing import Dict, Tuple, Optional
+from typing import Dict, List, Tuple, Optional
 
 from elevenlabs.client import ElevenLabs
 from elevenlabs.core.api_error import ApiError
@@ -82,6 +82,24 @@ class SpeakingClock:
         self._voice_id_cache: Optional[Dict[str, str]] = None
         # Whether the account's voices have already been listed after a failed lookup
         self._voices_listed = False
+        # Set to a list while a voice chain is walked, collecting its diagnostics
+        self._deferred_messages: Optional[List[str]] = None
+
+    def warn(self, message: str) -> None:
+        """
+        Report a diagnostic on stderr, holding it back while a voice chain is being walked
+
+        A chain exists so a voice that cannot be generated with is skipped over, so its
+        error is only worth showing when no later voice makes up for it. See obtain_speech(),
+        which flushes what it collected if the whole chain misses and drops it otherwise.
+
+        Args:
+            message: The line to report
+        """
+        if self._deferred_messages is None:
+            print(message, file=sys.stderr)
+        else:
+            self._deferred_messages.append(message)
 
     def get_current_time(self) -> Tuple[int, int]:
         """
@@ -195,14 +213,14 @@ class SpeakingClock:
             return next(iter(matches.values()))
 
         if matches:
-            print(f"*** Error: '{voice}' matches more than one voice:", file=sys.stderr)
+            self.warn(f"*** Error: '{voice}' matches more than one voice:")
             self.print_voices(matches)
         else:
-            print(f"*** Error: No voice named '{voice}' on your ElevenLabs account", file=sys.stderr)
+            self.warn(f"*** Error: No voice named '{voice}' on your ElevenLabs account")
             # A chain can miss on several voices in a row, and one listing says it all.
             if not self._voices_listed:
                 self._voices_listed = True
-                print("*** Available voices:", file=sys.stderr)
+                self.warn("*** Available voices:")
                 self.print_voices(self._voice_id_cache)
         return None
 
@@ -214,7 +232,7 @@ class SpeakingClock:
             voices: Mapping of voice name to voice ID
         """
         for name, known_id in sorted(voices.items()):
-            print(f"*** - {name}: {known_id}", file=sys.stderr)
+            self.warn(f"*** - {name}: {known_id}")
 
     def generate_speech(self, text: str, voice: str) -> Optional[bytes]:
         """
@@ -241,15 +259,13 @@ class SpeakingClock:
             )
             return b''.join(audio_chunks)
         except ValueError as e:
-            print(f"*** Error generating speech: {e}", file=sys.stderr)
+            self.warn(f"*** Error generating speech: {e}")
             return None
         except ApiError as e:
-            print(
-                f"*** ElevenLabs API error ({e.status_code}): {api_error_message(e)}",
-                file=sys.stderr)
+            self.warn(f"*** ElevenLabs API error ({e.status_code}): {api_error_message(e)}")
             return None
         except Exception as e:
-            print(f"*** Unexpected error generating speech: {e}", file=sys.stderr)
+            self.warn(f"*** Unexpected error generating speech: {e}")
             return None
 
     def obtain_speech(self, text: str, hour: int, minute: int) -> Optional[bytes]:
@@ -261,6 +277,9 @@ class SpeakingClock:
         say - still plays back the announcements cached while it was usable, and only a chain
         where every voice misses both is a failure. With the cache disabled every voice goes
         straight to the API, and nothing generated is written back.
+
+        A miss a later voice covers for is not the user's problem, so what the skipped voices
+        reported is held back and only printed when the chain ends up with nothing.
 
         Args:
             text: Text to convert to speech
@@ -275,16 +294,43 @@ class SpeakingClock:
             print("*** Error: No voice configured in 'elevenlabs.voice_id'", file=sys.stderr)
             return None
 
+        # A fresh buffer per chain: warn() collects into it instead of printing right away.
+        self._deferred_messages = []
+        audio_data = self.walk_voice_chain(text, hour, minute, voices)
+        deferred_messages = self._deferred_messages
+        self._deferred_messages = None
+
+        if audio_data is not None:
+            # A later voice made up for whatever the earlier ones had to say.
+            return audio_data
+
+        # Nothing played, so the collected story is now the explanation of why.
+        for message in deferred_messages:
+            print(message, file=sys.stderr)
+        print("*** Error: None of the configured voices is cached or available",
+              file=sys.stderr)
+        return None
+
+    def walk_voice_chain(self, text: str, hour: int, minute: int,
+                         voices: List[str]) -> Optional[bytes]:
+        """
+        Try each voice in turn, cache first and API second, until one yields audio
+
+        Args:
+            text: Text to convert to speech
+            hour: Hour the announcement is for, as used in the cache key
+            minute: Minute the announcement is for, as used in the cache key
+            voices: Voice IDs or names to walk, in the configured order
+
+        Returns:
+            Audio data as bytes, or None if every voice missed
+        """
         cache_enabled = self.config.is_cache_enabled()
 
         for index, voice in enumerate(voices):
-            cached_path = self.cache.get_cached_audio(voice, hour, minute) if cache_enabled else None
-            if cached_path:
-                try:
-                    return cached_path.read_bytes()
-                except OSError as e:
-                    # Unreadable cache is not a dead end - the API may still deliver.
-                    print(f"*** Error loading cached audio for '{voice}': {e}", file=sys.stderr)
+            cached_audio = self.load_cached_audio(voice, hour, minute) if cache_enabled else None
+            if cached_audio is not None:
+                return cached_audio
 
             audio_data = self.generate_speech(text, voice)
             if audio_data is not None:
@@ -293,12 +339,33 @@ class SpeakingClock:
                 return audio_data
 
             if index + 1 < len(voices):
-                print(f"*** Voice '{voice}' unusable, falling back to '{voices[index + 1]}'",
-                      file=sys.stderr)
+                self.warn(f"*** Voice '{voice}' unusable, "
+                          f"falling back to '{voices[index + 1]}'")
 
-        print("*** Error: None of the configured voices is cached or available",
-              file=sys.stderr)
         return None
+
+    def load_cached_audio(self, voice: str, hour: int, minute: int) -> Optional[bytes]:
+        """
+        Read the cached announcement for a voice, if there is a readable one
+
+        Args:
+            voice: Voice ID or name the announcement was generated with
+            hour: Hour the announcement is for, as used in the cache key
+            minute: Minute the announcement is for, as used in the cache key
+
+        Returns:
+            Cached audio data as bytes, or None if it is missing or unreadable
+        """
+        cached_path = self.cache.get_cached_audio(voice, hour, minute)
+        if not cached_path:
+            return None
+
+        try:
+            return cached_path.read_bytes()
+        except OSError as e:
+            # Unreadable cache is not a dead end - the API may still deliver.
+            self.warn(f"*** Error loading cached audio for '{voice}': {e}")
+            return None
 
     def at_configured_volume(self, audio_data: bytes) -> bytes:
         """
