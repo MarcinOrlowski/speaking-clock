@@ -1,9 +1,5 @@
 ![Speaking Clock](img/logo.webp)
 
-**Time announcer using ElevenLabs Text To Speach API**
-
----
-
 # Speaking Clock
 
 A small utility that speaks (usually current) time in specified language. Uses ElevenLabs API to
