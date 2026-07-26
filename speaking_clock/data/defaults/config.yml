@@ -30,4 +30,6 @@ audio:
   speech_offset_ms: 1000  # Milliseconds to wait before starting speech after chime starts
 
 cache:
-  directory: ".cache"  # Directory for caching audio files
+  # Directory for caching audio files. Defaults to $XDG_CACHE_HOME/speaking-clock
+  # (~/.cache/speaking-clock when XDG_CACHE_HOME is unset) unless set here.
+  # directory: "~/.cache/speaking-clock"
