@@ -82,6 +82,7 @@ class ConfigManager():
                 "audio_file": "clock-chime.mp3"
             },
             "cache": {
+                "enabled": True,
                 "directory": Const.DEFAULT_CACHE_DIR
             }
         }
@@ -155,6 +156,10 @@ class ConfigManager():
     def get_speech_offset_ms(self) -> int:
         """Get the offset in milliseconds for when to start speech after chime"""
         return self.config.get("audio", {}).get("speech_offset_ms", 1000)
+
+    def is_cache_enabled(self) -> bool:
+        """Check if announcements should be read from and written to the cache"""
+        return self.config.get("cache", {}).get("enabled", True)
 
     def get_cache_directory(self) -> str:
         """Get the cache directory path"""

@@ -64,6 +64,7 @@ audio:
   speech_offset_ms: 1000              # Milliseconds to wait before starting speech
 
 cache:
+  enabled: true                       # Read and write cached announcements
   directory: "~/.cache/speaking-clock"  # Optional. Overrides the XDG default location
 ```
 
@@ -152,6 +153,17 @@ pl-voice_id-13-05.mp3  # Polish, voice_id, 13:05
 
 This caching system ensures that each unique time announcement is only generated once, reducing API
 calls to ElevenLabs and improving response time for frequently requested times.
+
+Pass `--no-cache` to bypass the cache for a single run - the announcement is then generated fresh
+and is not written to disk:
+
+```bash
+speak-time --no-cache
+```
+
+Set `cache.enabled: false` in the config file to disable caching permanently. Note that with the
+cache off, a voice that is no longer available from the API can no longer fall back to what it
+cached earlier, so a [voice chain](#voice-fallbacks) loses that safety net.
 
 # Audio Support for Cron Jobs in KDE 5
 

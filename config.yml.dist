@@ -21,6 +21,7 @@ chime:
   audio_file: "clock-chime.mp3"  # Path to the chime audio file
 
 cache:
+  enabled: true  # Set to false to always generate speech instead of reusing cached files
   # Defaults to $XDG_CACHE_HOME/speaking-clock, or ~/.cache/speaking-clock when
   # XDG_CACHE_HOME is unset. Uncomment to override.
   # directory: "~/.cache/speaking-clock"
