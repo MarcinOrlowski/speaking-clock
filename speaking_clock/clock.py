@@ -39,6 +39,10 @@ VOICE_ID_RE = re.compile(r'^[A-Za-z0-9]{20}$')
 # Matches what the removed generate() produced by default, so cached MP3s stay byte-comparable.
 ELEVENLABS_OUTPUT_FORMAT = 'mp3_44100_128'
 
+# How long playback waits for one voice. A chain gets this much per configured voice, as it
+# may have to wait out a failed API call for each of them before the one that works.
+SPEECH_TIMEOUT_SECONDS = 30
+
 
 def api_error_message(error: ApiError) -> str:
     """
@@ -76,6 +80,8 @@ class SpeakingClock:
         self.el_client = ElevenLabs(api_key=self.config.get_elevenlabs_api_key())
         # Lazily populated name -> voice ID map
         self._voice_id_cache: Optional[Dict[str, str]] = None
+        # Whether the account's voices have already been listed after a failed lookup
+        self._voices_listed = False
 
     def get_current_time(self) -> Tuple[int, int]:
         """
@@ -193,8 +199,11 @@ class SpeakingClock:
             self.print_voices(matches)
         else:
             print(f"*** Error: No voice named '{voice}' on your ElevenLabs account", file=sys.stderr)
-            print("*** Available voices:", file=sys.stderr)
-            self.print_voices(self._voice_id_cache)
+            # A chain can miss on several voices in a row, and one listing says it all.
+            if not self._voices_listed:
+                self._voices_listed = True
+                print("*** Available voices:", file=sys.stderr)
+                self.print_voices(self._voice_id_cache)
         return None
 
     def print_voices(self, voices: Dict[str, str]) -> None:
@@ -207,32 +216,19 @@ class SpeakingClock:
         for name, known_id in sorted(voices.items()):
             print(f"*** - {name}: {known_id}", file=sys.stderr)
 
-    def generate_speech(self, text: str) -> Optional[bytes]:
+    def generate_speech(self, text: str, voice: str) -> Optional[bytes]:
         """
         Generate speech using ElevenLabs API
 
         Args:
             text: Text to convert to speech
+            voice: Voice ID or voice name to speak with
 
         Returns:
             Audio data as bytes or None if generation failed
         """
         try:
-            voice_id = self.config.get_elevenlabs_voice_id()
-            model_id = self.config.get_elevenlabs_model_id()
-
-            # Check if voice_id is still the default placeholder
-            if voice_id == "polish-voice-id" or not voice_id:
-                print(
-                    "*** Error: No valid ElevenLabs voice ID in your config",
-                    file=sys.stderr)
-                print("*** Available voices:", file=sys.stderr)
-                available_voices = self.el_client.voices.get_all()
-                for voice in available_voices.voices:
-                    print(f"*** - {voice.name}: {voice.voice_id}", file=sys.stderr)
-                return None
-
-            resolved_voice_id = self.resolve_voice_id(voice_id)
+            resolved_voice_id = self.resolve_voice_id(voice)
             if resolved_voice_id is None:
                 return None
 
@@ -240,7 +236,7 @@ class SpeakingClock:
             audio_chunks = self.el_client.text_to_speech.convert(
                 voice_id=resolved_voice_id,
                 text=text,
-                model_id=model_id,
+                model_id=self.config.get_elevenlabs_model_id(),
                 output_format=ELEVENLABS_OUTPUT_FORMAT,
             )
             return b''.join(audio_chunks)
@@ -255,6 +251,50 @@ class SpeakingClock:
         except Exception as e:
             print(f"*** Unexpected error generating speech: {e}", file=sys.stderr)
             return None
+
+    def obtain_speech(self, text: str, hour: int, minute: int) -> Optional[bytes]:
+        """
+        Get the announcement audio, walking the configured chain of voices
+
+        Each voice is tried in full before moving on: its cache first, then the API. That way
+        a voice the account can no longer generate with - one that moved behind a paid tier,
+        say - still plays back the announcements cached while it was usable, and only a chain
+        where every voice misses both is a failure.
+
+        Args:
+            text: Text to convert to speech
+            hour: Hour the announcement is for, as used in the cache key
+            minute: Minute the announcement is for, as used in the cache key
+
+        Returns:
+            Audio data as bytes, or None if no configured voice yielded any
+        """
+        voices = self.config.get_elevenlabs_voice_ids()
+        if not voices:
+            print("*** Error: No voice configured in 'elevenlabs.voice_id'", file=sys.stderr)
+            return None
+
+        for index, voice in enumerate(voices):
+            cached_path = self.cache.get_cached_audio(voice, hour, minute)
+            if cached_path:
+                try:
+                    return cached_path.read_bytes()
+                except OSError as e:
+                    # Unreadable cache is not a dead end - the API may still deliver.
+                    print(f"*** Error loading cached audio for '{voice}': {e}", file=sys.stderr)
+
+            audio_data = self.generate_speech(text, voice)
+            if audio_data is not None:
+                self.cache.save_audio(audio_data, voice, hour, minute)
+                return audio_data
+
+            if index + 1 < len(voices):
+                print(f"*** Voice '{voice}' unusable, falling back to '{voices[index + 1]}'",
+                      file=sys.stderr)
+
+        print("*** Error: None of the configured voices is cached or available",
+              file=sys.stderr)
+        return None
 
     def at_configured_volume(self, audio_data: bytes) -> bytes:
         """
@@ -338,47 +378,26 @@ class SpeakingClock:
             hour, minute = self.get_current_time()
         time_text = self.format_time_text(hour, minute)
 
-        # Get voice ID and potential cached file path
-        voice_id = self.config.get_elevenlabs_voice_id()
-        audio_path = self.cache.get_cached_file_path(voice_id, hour, minute)
-
-        # Event to track if speech audio generation is complete
+        # Event to track if the speech audio is ready
         speech_ready = threading.Event()
         speech_audio_data = None
-        speech_error = False
+        speech_timeout = SPEECH_TIMEOUT_SECONDS * max(
+            1, len(self.config.get_elevenlabs_voice_ids()))
 
-        # Check if we need to generate the speech audio
-        speech_needs_generation = not audio_path.exists()
-
-        # Start speech generation in a separate thread if needed
-        if speech_needs_generation:
-            def generate_audio():
-                nonlocal speech_audio_data, speech_error
-                try:
-                    result = self.generate_speech(time_text)
-                    if result is None:
-                        speech_error = True
-                    else:
-                        speech_audio_data = result
-                except Exception as e:
-                    print(f"*** Unexpected error in speech generation thread: {e}",
-                          file=sys.stderr)
-                    speech_error = True
-                finally:
-                    # Always set the event, even on error, to unblock the main thread
-                    speech_ready.set()
-
-            gen_thread = threading.Thread(target=generate_audio)
-            gen_thread.start()
-        else:
-            # Load speech audio from cache
+        # Walking the voice chain may hit the API, so keep it off the playback path
+        def obtain_audio():
+            nonlocal speech_audio_data
             try:
-                with open(audio_path, 'rb') as f:
-                    speech_audio_data = f.read()
+                speech_audio_data = self.obtain_speech(time_text, hour, minute)
             except Exception as e:
-                print(f"*** Error loading cached audio: {e}", file=sys.stderr)
-                speech_error = True
-            speech_ready.set()
+                print(f"*** Unexpected error in speech generation thread: {e}",
+                      file=sys.stderr)
+            finally:
+                # Always set the event, even on error, to unblock the main thread
+                speech_ready.set()
+
+        gen_thread = threading.Thread(target=obtain_audio)
+        gen_thread.start()
 
         # This will return the chime data but not play it if overlay is enabled
         chime_data = self.play_chime()
@@ -402,12 +421,12 @@ class SpeakingClock:
             start_time = time.time()
 
             # Wait for speech to be ready, with a timeout
-            if not speech_ready.wait(timeout=30):  # Wait up to 30 seconds
+            if not speech_ready.wait(timeout=speech_timeout):
                 print("*** Timeout waiting for speech generation", file=sys.stderr)
                 return False
 
             # If there was an error in speech generation, stop processing
-            if speech_error or speech_audio_data is None:
+            if speech_audio_data is None:
                 print("*** Speech generation failed, cannot continue",
                       file=sys.stderr)
                 return False
@@ -419,28 +438,20 @@ class SpeakingClock:
                 wait_time = offset_sec - elapsed
                 time.sleep(wait_time)
 
-            if speech_needs_generation:
-                # Save the original audio to cache (without volume adjustment)
-                self.cache.save_audio(speech_audio_data, voice_id, hour, minute)
-
             # Play the speech with volume adjustment
             play(self.at_configured_volume(speech_audio_data))
         else:
             # Standard sequential playback (chime already played in play_chime if enabled)
             # Wait for speech to be ready, with a timeout
-            if not speech_ready.wait(timeout=30):  # Wait up to 30 seconds
+            if not speech_ready.wait(timeout=speech_timeout):
                 print("*** Timeout waiting for speech generation", file=sys.stderr)
                 return False
 
             # If there was an error in speech generation, stop processing
-            if speech_error or speech_audio_data is None:
+            if speech_audio_data is None:
                 print("*** Speech generation failed, cannot continue",
                       file=sys.stderr)
                 return False
-
-            if speech_needs_generation:
-                # Save the original audio to cache (without volume adjustment)
-                self.cache.save_audio(speech_audio_data, voice_id, hour, minute)
 
             # If chime is disabled or overlay is disabled, play speech now with volume adjustment
             if not self.config.should_play_chime() or not self.config.should_overlay_speech():

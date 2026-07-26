@@ -54,7 +54,7 @@ language:
 
 elevenlabs:
   api_key: "your-api-key-here"        # Your ElevenLabs API key
-  voice_id: "voice-id-here"           # ElevenLabs voice ID
+  voice_id: "voice-id-here"           # ElevenLabs voice name or ID
   model_id: "eleven_multilingual_v2"  # TTS model to use
 
 audio:
@@ -66,6 +66,23 @@ audio:
 cache:
   directory: "~/.cache/speaking-clock"  # Optional. Overrides the XDG default location
 ```
+
+#### Voice fallbacks
+
+`voice_id` also takes a list, which turns each entry into a fallback for the one before it:
+
+```yaml
+elevenlabs:
+  voice_id:
+    - "Bratanek"
+    - "George"
+```
+
+Voices are tried in order, and each one is tried in full before the next: its cached
+announcements first, then the API. So a voice that has become unavailable - one that moved
+behind a paid tier, say - keeps playing back whatever was cached while it still worked, and
+announcements it never cached come from the next voice in the list. The run fails only when
+every voice misses both its cache and the API.
 
 You can also set your ElevenLabs API key as an environment variable:
 
