@@ -28,6 +28,23 @@
    pip install -r requirements.txt
    ```
 
+
+### Installation via `pip`
+
+...
+Of course, you can also use plain `pip` to do that:
+
+```bash
+$ pip install speaking-clock
+```
+
+But that might be a problem as some distributions no longer allow system-wide installations,
+therefore use of `pipx` is strongly recommended as the all-in-one solution.
+
+Once installed `speaking-clock` executable (and it's alias `speak-time`) should be available in
+your system ready to be used. Please use `--help` to see all available options.
+
+
 ## Usage
 
 ### As a Python module
