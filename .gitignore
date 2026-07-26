@@ -13,6 +13,7 @@
 /.markdownlint.yml
 /.pre-commit-config.yaml
 /venv/
+/.venv/
 
 # IDEA
 .idea/

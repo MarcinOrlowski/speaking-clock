@@ -78,9 +78,9 @@ def main():
     # Prepare command line overrides for config
     config_overrides = {}
     if args.chime:
-        config_overrides['audio'] = {'play_chime': True}
+        config_overrides['chime'] = {'enabled': True}
     elif args.no_chime:
-        config_overrides['audio'] = {'play_chime': False}
+        config_overrides['chime'] = {'enabled': False}
 
     # Add volume override if provided
     if args.volume is not None:

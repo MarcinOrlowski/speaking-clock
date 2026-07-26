@@ -5,11 +5,7 @@
  ▀▄▄▀ █▄▄▀ ▀▄▄▀ ▀▄▄▀ █  █ ▄█▄ █  █ ▀▄▄█     ▀▄▄▀ ▄█▄ ▀▄▄▀ ▀▄▄▀ █  █
       █                             ▄▄▀
 
- @project   Speaking Clock - time announcer using ElevenLabs TTS API
- @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
- @copyright 2025 Marcin Orlowski
- @license   https://www.opensource.org/licenses/mit-license.php MIT
- @link      https://github.com/MarcinOrlowski/speaking-clock
+   CLI driven time announcer using ElevenLabs Text To Speach API
 ```
 
 # Speaking Clock
@@ -43,32 +39,12 @@ and running, install the package:
 $ pipx install speaking-clock
 ```
 
-Of course, you can also use plain `pip` to do that:
-
-```bash
-$ pip install speaking-clock
-```
-
-But that might be a problem as some distributions no longer allow system-wide installations,
-therefore use of `pipx` is strongly recommended as the all-in-one solution.
-
-Once installed `speaking-clock` executable (and it's alias `speak-time`) should be available in
-your system ready to be used. Please use `--help` to see all available options.
-
 ## Usage
-
-### As a command-line tool
 
 Once installed, you can use the command-line interface:
 
-```
-speak-time
-```
-
-You can specify a custom config file:
-
-```
-speak-time --config /path/to/your/config.yml
+```bash
+$ speak-time
 ```
 
 ### Configuration
@@ -107,6 +83,14 @@ You can also set your ElevenLabs API key as an environment variable:
 export ELEVENLABS_API_KEY="your-api-key-here"
 ```
 
+### Using custom configuration file
+
+You can specify a custom config file:
+
+```bash
+$ speak-time --config /path/to/your/config.yml
+```
+
 ## Language Support
 
 The application supports multiple languages through YAML language definition files. These files are stored in the `languages/` directory with filenames matching their language code (e.g., `pl.yml` for Polish).
@@ -143,13 +127,13 @@ special_times:
 
 Audio files are automatically cached in the `.cache` directory using the following naming convention:
 
-```
+```ascii
 LANG-VOICE-HH-MM.mp3
 ```
 
 For example:
 
-```
+```ascii
 pl-voice_id-13-05.mp3  # Polish, voice_id, 13:05
 ```
 
