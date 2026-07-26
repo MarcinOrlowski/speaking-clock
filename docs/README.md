@@ -196,20 +196,20 @@ Set `cache.enabled: false` in the config file to disable caching permanently. No
 cache off, a voice that is no longer available from the API can no longer fall back to what it
 cached earlier, so a [voice chain](#voice-fallbacks) loses that safety net.
 
-# Audio Support for Cron Jobs in KDE/Plasma
+## Audio Support for Cron Jobs in KDE/Plasma
 
-## Problem
+### Problem
 
 When running Python applications from cron jobs in KDE/Plasma, audio playback doesn't work automatically.
 This is because cron jobs run in a separate environment without access to your desktop session's
 audio system.
 
-## Solution
+### Solution
 
 Configure the cron job with specific environment variables to access your KDE desktop session's
 audio services.
 
-### Required Environment Variables
+#### Required Environment Variables
 
 For audio playback in KDE, your cron job needs these key environment variables:
 
@@ -217,7 +217,7 @@ For audio playback in KDE, your cron job needs these key environment variables:
 - `DBUS_SESSION_BUS_ADDRESS`: Connects to your D-Bus session
 - `XDG_RUNTIME_DIR`: Required for PulseAudio/PipeWire access
 
-### Setting Up the Cron Job
+#### Setting Up the Cron Job
 
 Edit your crontab and add your job using this template (it's assumed app is
 installed via `pipx` so its binary sits in `~/.local/bin/` folder):
@@ -231,7 +231,7 @@ installed via `pipx` so its binary sits in `~/.local/bin/` folder):
 
 <!-- markdownlint-enable MD013 -->
 
-### Testing Your Configuration
+#### Testing Your Configuration
 
 To test without waiting for the scheduled time:
 
@@ -244,9 +244,9 @@ DISPLAY=:0 \
   .local/bin/speak-time
 ```
 
-## Troubleshooting
+### Troubleshooting
 
-### Common Issues and Solutions
+#### Common Issues and Solutions
 
 1. **No audio despite correct configuration**:
 
@@ -266,7 +266,7 @@ DISPLAY=:0 \
 
 - For PipeWire: Add `PIPEWIRE_RUNTIME_DIR=${XDG_RUNTIME_DIR}/pipewire-0`
 
-## Limitations
+### Limitations
 
 This solution only works when:
 
