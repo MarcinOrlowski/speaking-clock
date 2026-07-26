@@ -18,33 +18,47 @@
 
 Command-line interface for the speaking clock
 
+Every option has both a long and a short form. Lowercase short forms set or enable,
+their uppercase counterparts disable:
+
+    -c, --config FILE   -t, --time HH:MM   -v, --volume LEVEL
+    -k, --cache DIR     -K, --no-cache
+    -b, --chime         -B, --no-chime
+
 Examples:
     # Speak the current time
     speak-time
 
     # Speak a specific time
     speak-time --time 14:30
-
-    # Short form
     speak-time -t 14:30
 
     # With custom config
     speak-time -t 08:15 --config ~/my-config.yml
+    speak-time -t 08:15 -c ~/my-config.yml
 
     # Disable the chime
     speak-time --no-chime
+    speak-time -B
 
     # Enable the chime (overriding config)
     speak-time --chime
+    speak-time -b
 
     # Set audio volume (0.0 to 1.0)
     speak-time --volume 0.5
+    speak-time -v 0.5
+
+    # Use a custom cache directory
+    speak-time --cache ~/my-cache
+    speak-time -k ~/my-cache
 
     # Bypass the cache entirely (no read, no write)
     speak-time --no-cache
+    speak-time -K
 
     # Combine options
-    speak-time -t 08:15 --no-chime --volume 0.8
+    speak-time -t 08:15 -B -v 0.8
 """
 
 import argparse
@@ -57,11 +71,11 @@ from .clock import SpeakingClock
 def main():
     """Main entry point for CLI"""
     parser = argparse.ArgumentParser(description="Speaking Clock")
-    parser.add_argument("--cache",
+    parser.add_argument("--cache", '-k',
                         default=None,
                         metavar='DIR',
                         help=f'Location of file cache. Default: {Const.DEFAULT_CACHE_DIR}')
-    parser.add_argument("--no-cache",
+    parser.add_argument("--no-cache", '-K',
                         action='store_true',
                         help='Neither read nor write cached announcements for this run')
     parser.add_argument("--config", '-c',
@@ -71,10 +85,10 @@ def main():
                         help='Specify time in format "HH:MM" (e.g. 14:30). If not provided, current time will be used.')
     # Create a mutually exclusive group for chime options
     chime_group = parser.add_mutually_exclusive_group()
-    chime_group.add_argument("--chime",
+    chime_group.add_argument("--chime", '-b',
                              action='store_true',
                              help='Enable the chime sound (overrides config file)')
-    chime_group.add_argument("--no-chime",
+    chime_group.add_argument("--no-chime", '-B',
                              action='store_true',
                              help='Disable the chime sound (overrides config file)')
     parser.add_argument("--volume", '-v',

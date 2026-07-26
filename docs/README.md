@@ -20,6 +20,28 @@ Once installed, you can call the clock as `speak-time` or `speaking-clock` execu
 speak-time
 ```
 
+### Options
+
+Every option comes in both a long and a short form. Lowercase short forms set or enable something,
+their uppercase counterparts turn it off:
+
+| Long         | Short | Argument | Description                                               |
+| ------------ | ----- | -------- | --------------------------------------------------------- |
+| `--config`   | `-c`  | `FILE`   | Configuration file path.                                  |
+| `--time`     | `-t`  | `HH:MM`  | Time to announce. Defaults to the current time.           |
+| `--volume`   | `-v`  | `LEVEL`  | Audio volume, from `0.0` to `1.0`.                        |
+| `--cache`    | `-k`  | `DIR`    | Cache directory to use.                                   |
+| `--no-cache` | `-K`  |          | Neither read nor write cached announcements for this run. |
+| `--chime`    | `-b`  |          | Enable the chime sound, overriding the config file.       |
+| `--no-chime` | `-B`  |          | Disable the chime sound, overriding the config file.      |
+| `--help`     | `-h`  |          | Show the built-in help and exit.                          |
+
+`--chime` and `--no-chime` are mutually exclusive, so pass at most one of them.
+
+```bash
+speak-time -t 08:15 -B -v 0.8
+```
+
 ### Configuration
 
 The speaking-clock looks for configuration in the following places:
@@ -104,6 +126,7 @@ You can specify a custom config file:
 
 ```bash
 speak-time --config /path/to/your/config.yml
+speak-time -c /path/to/your/config.yml
 ```
 
 ## Language Support
@@ -144,7 +167,7 @@ special_times:
 
 Audio files are automatically cached in `$XDG_CACHE_HOME/speaking-clock`, falling back to
 `~/.cache/speaking-clock` when `XDG_CACHE_HOME` is unset (or holds a relative path). Set
-`cache.directory` in the config file, or pass `--cache <DIR>`, to use another location.
+`cache.directory` in the config file, or pass `--cache <DIR>` (`-k <DIR>`), to use another location.
 
 Cached files follow the naming convention:
 
@@ -166,26 +189,27 @@ and is not written to disk:
 
 ```bash
 speak-time --no-cache
+speak-time -K
 ```
 
 Set `cache.enabled: false` in the config file to disable caching permanently. Note that with the
 cache off, a voice that is no longer available from the API can no longer fall back to what it
 cached earlier, so a [voice chain](#voice-fallbacks) loses that safety net.
 
-# Audio Support for Cron Jobs in KDE/Plasma
+## Audio Support for Cron Jobs in KDE/Plasma
 
-## Problem
+### Problem
 
 When running Python applications from cron jobs in KDE/Plasma, audio playback doesn't work automatically.
 This is because cron jobs run in a separate environment without access to your desktop session's
 audio system.
 
-## Solution
+### Solution
 
 Configure the cron job with specific environment variables to access your KDE desktop session's
 audio services.
 
-### Required Environment Variables
+#### Required Environment Variables
 
 For audio playback in KDE, your cron job needs these key environment variables:
 
@@ -193,7 +217,7 @@ For audio playback in KDE, your cron job needs these key environment variables:
 - `DBUS_SESSION_BUS_ADDRESS`: Connects to your D-Bus session
 - `XDG_RUNTIME_DIR`: Required for PulseAudio/PipeWire access
 
-### Setting Up the Cron Job
+#### Setting Up the Cron Job
 
 Edit your crontab and add your job using this template (it's assumed app is
 installed via `pipx` so its binary sits in `~/.local/bin/` folder):
@@ -207,7 +231,7 @@ installed via `pipx` so its binary sits in `~/.local/bin/` folder):
 
 <!-- markdownlint-enable MD013 -->
 
-### Testing Your Configuration
+#### Testing Your Configuration
 
 To test without waiting for the scheduled time:
 
@@ -220,9 +244,9 @@ DISPLAY=:0 \
   .local/bin/speak-time
 ```
 
-## Troubleshooting
+### Troubleshooting
 
-### Common Issues and Solutions
+#### Common Issues and Solutions
 
 1. **No audio despite correct configuration**:
 
@@ -242,7 +266,7 @@ DISPLAY=:0 \
 
 - For PipeWire: Add `PIPEWIRE_RUNTIME_DIR=${XDG_RUNTIME_DIR}/pipewire-0`
 
-## Limitations
+### Limitations
 
 This solution only works when:
 
