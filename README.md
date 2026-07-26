@@ -64,6 +64,7 @@ audio:
   speech_offset_ms: 1000              # Milliseconds to wait before starting speech
 
 cache:
+  enabled: true                       # Read and write cached audio files
   directory: ".cache"                 # Directory for caching audio files
 ```
 
@@ -132,6 +133,16 @@ pl-voice_id-13-05.mp3  # Polish, voice_id, 13:05
 
 This caching system ensures that each unique time announcement is only generated once, reducing API
 calls to ElevenLabs and improving response time for frequently requested times.
+
+Pass `--no-cache` to bypass the cache for a single run - the announcement is generated fresh and is
+not written to disk:
+
+```bash
+speak-time --no-cache
+```
+
+Use `--cache DIR` to point a single run at a different cache directory, or set `cache.enabled: false`
+in the config file to disable caching permanently.
 
 # Audio Support for Cron Jobs in KDE 5
 

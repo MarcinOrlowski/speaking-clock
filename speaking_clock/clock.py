@@ -338,9 +338,10 @@ class SpeakingClock:
             hour, minute = self.get_current_time()
         time_text = self.format_time_text(hour, minute)
 
-        # Get voice ID and potential cached file path
+        # Get voice ID and the cached file, if caching is on and the file is already there
         voice_id = self.config.get_elevenlabs_voice_id()
-        audio_path = self.cache.get_cached_file_path(voice_id, hour, minute)
+        cache_enabled = self.config.is_cache_enabled()
+        audio_path = self.cache.get_cached_audio(voice_id, hour, minute) if cache_enabled else None
 
         # Event to track if speech audio generation is complete
         speech_ready = threading.Event()
@@ -348,7 +349,7 @@ class SpeakingClock:
         speech_error = False
 
         # Check if we need to generate the speech audio
-        speech_needs_generation = not audio_path.exists()
+        speech_needs_generation = audio_path is None
 
         # Start speech generation in a separate thread if needed
         if speech_needs_generation:
@@ -419,7 +420,7 @@ class SpeakingClock:
                 wait_time = offset_sec - elapsed
                 time.sleep(wait_time)
 
-            if speech_needs_generation:
+            if speech_needs_generation and cache_enabled:
                 # Save the original audio to cache (without volume adjustment)
                 self.cache.save_audio(speech_audio_data, voice_id, hour, minute)
 
@@ -438,7 +439,7 @@ class SpeakingClock:
                       file=sys.stderr)
                 return False
 
-            if speech_needs_generation:
+            if speech_needs_generation and cache_enabled:
                 # Save the original audio to cache (without volume adjustment)
                 self.cache.save_audio(speech_audio_data, voice_id, hour, minute)
 

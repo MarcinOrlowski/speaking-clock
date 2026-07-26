@@ -2,6 +2,10 @@
 
 ## v1.1.0 (TBD)
 
+* Added `--no-cache` to skip both reading and writing cached announcements.
+* Added `cache.enabled` config option.
+* Fixed `--cache` being silently ignored.
+* Cache directory is now created on first write instead of on every run.
 * Fixed speech generation failing against ElevenLabs SDK 2.x.
 * Fixed audio playback crashing with `'module' object is not callable` on ElevenLabs SDK 2.x.
 * ElevenLabs API errors now report just the message instead of dumping every HTTP header.

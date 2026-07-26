@@ -30,4 +30,5 @@ audio:
   speech_offset_ms: 1000  # Milliseconds to wait before starting speech after chime starts
 
 cache:
+  enabled: true  # Set to false to always generate speech instead of reusing cached files
   directory: ".cache"  # Directory for caching audio files

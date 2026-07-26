@@ -27,7 +27,6 @@ class AudioCache:
     """Audio cache manager for speaking clock"""
     def __init__(self, cache_dir: str, language: str):
         self.base_dir = Path(os.path.expanduser(cache_dir))
-        self.base_dir.mkdir(parents=True, exist_ok=True)
         self.language = language
 
     def get_cache_filename(self, voice_id: str, hour: int, minute: int) -> str:
@@ -78,6 +77,8 @@ class AudioCache:
             Path to cached file
         """
         cache_path = self.get_cached_file_path(voice_id, hour, minute)
+        # Created on first write so a cache-disabled run leaves no empty directory behind
+        self.base_dir.mkdir(parents=True, exist_ok=True)
         with open(cache_path, 'wb') as file:
             file.write(audio_data)
 
