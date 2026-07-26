@@ -189,11 +189,11 @@ Set `cache.enabled: false` in the config file to disable caching permanently. No
 cache off, a voice that is no longer available from the API can no longer fall back to what it
 cached earlier, so a [voice chain](#voice-fallbacks) loses that safety net.
 
-# Audio Support for Cron Jobs in KDE 5
+# Audio Support for Cron Jobs in KDE/Plasma
 
 ## Problem
 
-When running Python applications from cron jobs in KDE 5, audio playback doesn't work automatically.
+When running Python applications from cron jobs in KDE/Plasma, audio playback doesn't work automatically.
 This is because cron jobs run in a separate environment without access to your desktop session's
 audio system.
 
@@ -204,7 +204,7 @@ audio services.
 
 ### Required Environment Variables
 
-For audio playback in KDE 5, your cron job needs these key environment variables:
+For audio playback in KDE, your cron job needs these key environment variables:
 
 - `DISPLAY`: Points to your X server display
 - `DBUS_SESSION_BUS_ADDRESS`: Connects to your D-Bus session
