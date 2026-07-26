@@ -20,7 +20,7 @@ Configuration management for the speaking clock
 
 import os
 import sys
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 import yaml
 
@@ -113,9 +113,20 @@ class ConfigManager():
             return api_key
         raise ValueError("No ElevenLabs API key found in config or environment variable.")
 
-    def get_elevenlabs_voice_id(self) -> str:
-        """Get voice ID from config"""
-        return self.config.get("elevenlabs", {}).get("voice_id", "Bratanek")
+    def get_elevenlabs_voice_ids(self) -> List[str]:
+        """
+        Get the chain of voices from config, in the order they should be tried
+
+        A single voice may be given as a plain string. A list turns the later entries into
+        fallbacks, used when an earlier voice is neither cached nor obtainable from the API.
+
+        Returns:
+            Voice names or IDs, blanks dropped
+        """
+        voices = self.config.get("elevenlabs", {}).get("voice_id", "Bratanek")
+        if not isinstance(voices, list):
+            voices = [voices]
+        return [str(voice).strip() for voice in voices if str(voice).strip()]
 
     def get_elevenlabs_model_id(self) -> str:
         """Get model ID from config"""

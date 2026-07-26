@@ -4,7 +4,11 @@ language:
 
 elevenlabs:
   api_key: "<YOUR API KEY>"  # Your ElevenLabs API key
-  voice_id: "<VOICE NAME OR ID>"   # Replace with a valid voice ID from your ElevenLabs account
+  # Voice name or ID from your ElevenLabs account. Give a list to set up fallbacks:
+  # voice_id:
+  #   - "<PREFERRED VOICE>"
+  #   - "<FALLBACK VOICE>"
+  voice_id: "<VOICE NAME OR ID>"
   model_id: "eleven_multilingual_v2"
 
 audio:
