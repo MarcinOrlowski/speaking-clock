@@ -13,7 +13,8 @@ authors = [
     {name = "Marcin Orlowski", email = "mail@marcinorlowski.com"}
 ]
 dependencies = [
-    "elevenlabs",
+    # 2.0 dropped client.generate() in favour of client.text_to_speech.convert()
+    "elevenlabs>=2.0",
     "PyYAML",
     "python-dateutil",
     "num2words",
