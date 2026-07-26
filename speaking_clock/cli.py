@@ -55,8 +55,8 @@ def main():
     """Main entry point for CLI"""
     parser = argparse.ArgumentParser(description="Speaking Clock")
     parser.add_argument("--cache",
-                        default=Const.DEFAULT_CACHE_DIR,
-                        help='Location of file cache. Default: %(default)s')
+                        default=None,
+                        help=f'Location of file cache. Default: {Const.DEFAULT_CACHE_DIR}')
     parser.add_argument("--config", '-c',
                         default=Const.DEFAULT_CONFIG_PATH,
                         help='Configuration file path. Default: %(default)s')
@@ -81,6 +81,10 @@ def main():
         config_overrides['chime'] = {'enabled': True}
     elif args.no_chime:
         config_overrides['chime'] = {'enabled': False}
+
+    # Only override when given, so the config file keeps precedence over the built-in default
+    if args.cache is not None:
+        config_overrides['cache'] = {'directory': args.cache}
 
     # Add volume override if provided
     if args.volume is not None:

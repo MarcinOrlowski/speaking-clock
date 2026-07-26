@@ -64,7 +64,7 @@ audio:
   speech_offset_ms: 1000              # Milliseconds to wait before starting speech
 
 cache:
-  directory: ".cache"                 # Directory for caching audio files
+  directory: "~/.cache/speaking-clock"  # Optional. Overrides the XDG default location
 ```
 
 #### Voice fallbacks
@@ -134,8 +134,11 @@ special_times:
 
 ## Cache Files
 
-Audio files are automatically cached in the `.cache` directory using the following naming
-convention:
+Audio files are automatically cached in `$XDG_CACHE_HOME/speaking-clock`, falling back to
+`~/.cache/speaking-clock` when `XDG_CACHE_HOME` is unset (or holds a relative path). Set
+`cache.directory` in the config file, or pass `--cache <DIR>`, to use another location.
+
+Cached files follow the naming convention:
 
 ```ascii
 LANG-VOICE-HH-MM.mp3

@@ -19,3 +19,8 @@ audio:
 chime:
   enabled: true  # Set to true to play a chime before speaking the time
   audio_file: "clock-chime.mp3"  # Path to the chime audio file
+
+cache:
+  # Defaults to $XDG_CACHE_HOME/speaking-clock, or ~/.cache/speaking-clock when
+  # XDG_CACHE_HOME is unset. Uncomment to override.
+  # directory: "~/.cache/speaking-clock"
