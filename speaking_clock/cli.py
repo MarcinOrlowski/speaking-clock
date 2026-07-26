@@ -40,6 +40,9 @@ Examples:
     # Set audio volume (0.0 to 1.0)
     speak-time --volume 0.5
 
+    # Bypass the cache entirely (no read, no write)
+    speak-time --no-cache
+
     # Combine options
     speak-time -t 08:15 --no-chime --volume 0.8
 """
@@ -55,8 +58,12 @@ def main():
     """Main entry point for CLI"""
     parser = argparse.ArgumentParser(description="Speaking Clock")
     parser.add_argument("--cache",
-                        default=Const.DEFAULT_CACHE_DIR,
-                        help='Location of file cache. Default: %(default)s')
+                        default=None,
+                        metavar='DIR',
+                        help=f'Location of file cache. Default: {Const.DEFAULT_CACHE_DIR}')
+    parser.add_argument("--no-cache",
+                        action='store_true',
+                        help='Neither read nor write cached announcements for this run')
     parser.add_argument("--config", '-c',
                         default=Const.DEFAULT_CONFIG_PATH,
                         help='Configuration file path. Default: %(default)s')
@@ -65,11 +72,11 @@ def main():
     # Create a mutually exclusive group for chime options
     chime_group = parser.add_mutually_exclusive_group()
     chime_group.add_argument("--chime",
-                            action='store_true',
-                            help='Enable the chime sound (overrides config file)')
+                             action='store_true',
+                             help='Enable the chime sound (overrides config file)')
     chime_group.add_argument("--no-chime",
-                            action='store_true',
-                            help='Disable the chime sound (overrides config file)')
+                             action='store_true',
+                             help='Disable the chime sound (overrides config file)')
     parser.add_argument("--volume", '-v',
                         type=float,
                         help='Set audio volume level (0.0 to 1.0)')
@@ -78,9 +85,18 @@ def main():
     # Prepare command line overrides for config
     config_overrides = {}
     if args.chime:
-        config_overrides['audio'] = {'play_chime': True}
+        config_overrides['chime'] = {'enabled': True}
     elif args.no_chime:
-        config_overrides['audio'] = {'play_chime': False}
+        config_overrides['chime'] = {'enabled': False}
+
+    # Only override when given, so the config file keeps precedence over the built-in default
+    cache_overrides = {}
+    if args.cache is not None:
+        cache_overrides['directory'] = args.cache
+    if args.no_cache:
+        cache_overrides['enabled'] = False
+    if cache_overrides:
+        config_overrides['cache'] = cache_overrides
 
     # Add volume override if provided
     if args.volume is not None:

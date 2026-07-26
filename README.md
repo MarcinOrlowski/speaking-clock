@@ -1,27 +1,14 @@
-```
- ▄▀▀▄                █     ▀                ▄▀▀▄ ▀█            █
- ▀▄▄  █▀▀▄ ▄▀▀▄ ▄▀▀▄ █ ▄▀ ▀█  █▀▀▄ ▄▀▀█     █     █  ▄▀▀▄ ▄▀▀▄ █ ▄▀
-    █ █  █ █▀▀   ▄▄█ █▀▄   █  █  █ █  █     █     █  █  █ █    █▀▄
- ▀▄▄▀ █▄▄▀ ▀▄▄▀ ▀▄▄▀ █  █ ▄█▄ █  █ ▀▄▄█     ▀▄▄▀ ▄█▄ ▀▄▄▀ ▀▄▄▀ █  █
-      █                             ▄▄▀
-
- @project   Speaking Clock - time announcer using ElevenLabs TTS API
- @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
- @copyright 2025 Marcin Orlowski
- @license   https://www.opensource.org/licenses/mit-license.php MIT
- @link      https://github.com/MarcinOrlowski/speaking-clock
-```
+![Speaking Clock](img/logo.webp)
 
 # Speaking Clock
 
-A small utility that speaks (usually current) time in specified language. Uses ElevenLabs API
-to generate the speech. Supports caching and reusing audio files so free ElevenLabs
-access is more than enough. Handy to sit in cron jobs to periodically announce the time.
+A small utility that speaks (usually current) time in specified language. Uses ElevenLabs API to
+generate the speech. Supports caching and reusing audio files so free ElevenLabs access is more than
+enough. Handy to sit in cron jobs to periodically announce the time.
 
 ## Features
 
 - Gets the current time and speaks it in specified language
-- Converts numbers to their Polish word representation (e.g., "13:05" → "trzynasta pięć")
 - Uses ElevenLabs API for high-quality text-to-speech
 - Caches generated audio files for quick reuse
 - Supports both 12-hour and 24-hour time formats
@@ -33,42 +20,21 @@ access is more than enough. Handy to sit in cron jobs to periodically announce t
 ## Installation
 
 This app is regular Python package and is also hosted
-on [PyPi](https://pypi.org/project/speaking-clock/) so
-you can install it as usual. But because this one is supposed to rather act as the application, I
-strongly recommend to use [pipx](https://pipx.pypa.io/) to install this tool in isolated
-environment be it on Linux, Windows or MacOS machines. Once you got `pipx` up
-and running, install the package:
+on [PyPi](https://pypi.org/project/speaking-clock/) so you can install it as usual. But because this
+one is supposed to rather act as the application, I strongly recommend to
+use [pipx](https://pipx.pypa.io/) to install this tool in isolated environment be it on Linux,
+Windows or MacOS machines. Once you got `pipx` up and running, install the package:
 
 ```bash
 $ pipx install speaking-clock
 ```
 
-Of course, you can also use plain `pip` to do that:
-
-```bash
-$ pip install speaking-clock
-```
-
-But that might be a problem as some distributions no longer allow system-wide installations,
-therefore use of `pipx` is strongly recommended as the all-in-one solution.
-
-Once installed `speaking-clock` executable (and it's alias `speak-time`) should be available in
-your system ready to be used. Please use `--help` to see all available options.
-
 ## Usage
-
-### As a command-line tool
 
 Once installed, you can use the command-line interface:
 
-```
-speak-time
-```
-
-You can specify a custom config file:
-
-```
-speak-time --config /path/to/your/config.yml
+```bash
+$ speak-time
 ```
 
 ### Configuration
@@ -83,33 +49,61 @@ You can create a config file at `~/.config/speaking-clock/config.yml` with the f
 
 ```yaml
 language:
-  code: "pl"              # Language code matching a file in 'languages/' directory
-  use_24h_clock: true     # Use 24-hour (true) or 12-hour (false) format
+  code: "pl"                          # Language code matching a file in 'languages/' directory
+  use_24h_clock: true                 # Use 24-hour (true) or 12-hour (false) format
 
 elevenlabs:
-  api_key: "your-api-key-here"  # Your ElevenLabs API key
-  voice_id: "voice-id-here"     # ElevenLabs voice ID
+  api_key: "your-api-key-here"        # Your ElevenLabs API key
+  voice_id: "voice-id-here"           # ElevenLabs voice name or ID
   model_id: "eleven_multilingual_v2"  # TTS model to use
 
 audio:
-  play_chime: true        # Play a chime before speaking the time
-  chime_file: "clock-chime.mp3"  # Path to the chime audio file
-  overlay_speech: true    # Overlay speech over the chime sound
-  speech_offset_ms: 1000  # Milliseconds to wait before starting speech
+  play_chime: true                    # Play a chime before speaking the time
+  chime_file: "clock-chime.mp3"       # Path to the chime audio file
+  overlay_speech: true                # Overlay speech over the chime sound
+  speech_offset_ms: 1000              # Milliseconds to wait before starting speech
 
 cache:
-  directory: ".cache"     # Directory for caching audio files
+  enabled: true                       # Read and write cached announcements
+  directory: "~/.cache/speaking-clock"  # Optional. Overrides the XDG default location
 ```
+
+#### Voice fallbacks
+
+`voice_id` also takes a list, which turns each entry into a fallback for the one before it:
+
+```yaml
+elevenlabs:
+  voice_id:
+    - "Bratanek"
+    - "George"
+```
+
+Voices are tried in order, and each one is tried in full before the next: its cached
+announcements first, then the API. So a voice that has become unavailable - one that moved
+behind a paid tier, say - keeps playing back whatever was cached while it still worked, and
+announcements it never cached come from the next voice in the list. The run fails only when
+every voice misses both its cache and the API.
 
 You can also set your ElevenLabs API key as an environment variable:
 
-```
+```bash
 export ELEVENLABS_API_KEY="your-api-key-here"
+```
+
+### Using custom configuration file
+
+You can specify a custom config file:
+
+```bash
+speak-time --config /path/to/your/config.yml
 ```
 
 ## Language Support
 
-The application supports multiple languages through YAML language definition files. These files are stored in the `languages/` directory with filenames matching their language code (e.g., `pl.yml` for Polish).
+The application supports multiple languages through YAML language definition files. These files are
+stored in the `languages/` directory with filenames matching their language code (e.g., `pl.yml`
+for Polish).
 
 To add support for a new language:
 
@@ -141,29 +135,48 @@ special_times:
 
 ## Cache Files
 
-Audio files are automatically cached in the `.cache` directory using the following naming convention:
+Audio files are automatically cached in `$XDG_CACHE_HOME/speaking-clock`, falling back to
+`~/.cache/speaking-clock` when `XDG_CACHE_HOME` is unset (or holds a relative path). Set
+`cache.directory` in the config file, or pass `--cache <DIR>`, to use another location.
 
-```
+Cached files follow the naming convention:
+
+```ascii
 LANG-VOICE-HH-MM.mp3
 ```
 
 For example:
 
-```
+```ascii
 pl-voice_id-13-05.mp3  # Polish, voice_id, 13:05
 ```
 
-This caching system ensures that each unique time announcement is only generated once, reducing API calls to ElevenLabs and improving response time for frequently requested times.
+This caching system ensures that each unique time announcement is only generated once, reducing API
+calls to ElevenLabs and improving response time for frequently requested times.
+
+Pass `--no-cache` to bypass the cache for a single run - the announcement is then generated fresh
+and is not written to disk:
+
+```bash
+speak-time --no-cache
+```
+
+Set `cache.enabled: false` in the config file to disable caching permanently. Note that with the
+cache off, a voice that is no longer available from the API can no longer fall back to what it
+cached earlier, so a [voice chain](#voice-fallbacks) loses that safety net.
 
 # Audio Support for Cron Jobs in KDE 5
 
 ## Problem
 
-When running Python applications from cron jobs in KDE 5, audio playback doesn't work automatically. This is because cron jobs run in a separate environment without access to your desktop session's audio system.
+When running Python applications from cron jobs in KDE 5, audio playback doesn't work automatically.
+This is because cron jobs run in a separate environment without access to your desktop session's
+audio system.
 
 ## Solution
 
-Configure the cron job with specific environment variables to access your KDE desktop session's audio services.
+Configure the cron job with specific environment variables to access your KDE desktop session's
+audio services.
 
 ### Required Environment Variables
 
@@ -183,10 +196,14 @@ crontab -e
 
 Add your job using this template:
 
+<!-- markdownlint-disable MD013 -- a crontab entry must be a single line; cron has no line continuation -->
+
 ```bash
 # Run every hour at minute 0
 0 * * * * DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$(pgrep -u $LOGNAME plasma-session)/environ | cut -d= -f2-) XDG_RUNTIME_DIR=/run/user/$(id -u) python /path/to/your/script.py
 ```
+
+<!-- markdownlint-enable MD013 -->
 
 ### Testing Your Configuration
 
@@ -194,7 +211,11 @@ To test without waiting for the scheduled time:
 
 ```bash
 # Test the exact command that cron will run
-DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$(pgrep -u $LOGNAME plasma-session)/environ | cut -d= -f2-) XDG_RUNTIME_DIR=/run/user/$(id -u) python /path/to/your/script.py
+DISPLAY=:0 \
+  DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS \
+    /proc/$(pgrep -u $LOGNAME plasma-session)/environ | cut -d= -f2-) \
+  XDG_RUNTIME_DIR=/run/user/$(id -u) \
+  python /path/to/your/script.py
 ```
 
 ## Troubleshooting
@@ -203,21 +224,21 @@ DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$(p
 
 1. **No audio despite correct configuration**:
 
-   - Ensure PulseAudio is running: `pulseaudio --check`
-   - Try adding `PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native` to your environment variables
+- Ensure PulseAudio is running: `pulseaudio --check`
+- Try adding `PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native` to your environment variables
 
 1. **D-Bus address not found**:
 
-   - If plasma-session isn't found, try: `pgrep -u $LOGNAME plasmashell` instead
+- If plasma-session isn't found, try: `pgrep -u $LOGNAME plasmashell` instead
 
 1. **Permission issues**:
 
-   - Check audio group membership: `groups | grep audio`
-   - Add yourself if needed: `sudo usermod -a -G audio $USER`
+- Check audio group membership: `groups | grep audio`
+- Add yourself if needed: `sudo usermod -a -G audio $USER`
 
 1. **Application-specific audio servers**:
 
-   - For PipeWire: Add `PIPEWIRE_RUNTIME_DIR=${XDG_RUNTIME_DIR}/pipewire-0`
+- For PipeWire: Add `PIPEWIRE_RUNTIME_DIR=${XDG_RUNTIME_DIR}/pipewire-0`
 
 ## Limitations
 

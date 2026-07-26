@@ -20,7 +20,7 @@ Configuration management for the speaking clock
 
 import os
 import sys
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 import yaml
 
@@ -82,6 +82,7 @@ class ConfigManager():
                 "audio_file": "clock-chime.mp3"
             },
             "cache": {
+                "enabled": True,
                 "directory": Const.DEFAULT_CACHE_DIR
             }
         }
@@ -93,7 +94,7 @@ class ConfigManager():
                 return yaml.safe_load(file)
         except (yaml.YAMLError, FileNotFoundError) as e:
             print(f"Notice: Config file not found or invalid at {config_path}: {e}", file=sys.stderr)
-            print(f"Using default configuration", file=sys.stderr)
+            print("Using default configuration", file=sys.stderr)
             return None
 
     def _update_config(self, user_config: Dict[str, Any]) -> None:
@@ -113,9 +114,20 @@ class ConfigManager():
             return api_key
         raise ValueError("No ElevenLabs API key found in config or environment variable.")
 
-    def get_elevenlabs_voice_id(self) -> str:
-        """Get voice ID from config"""
-        return self.config.get("elevenlabs", {}).get("voice_id", "Bratanek")
+    def get_elevenlabs_voice_ids(self) -> List[str]:
+        """
+        Get the chain of voices from config, in the order they should be tried
+
+        A single voice may be given as a plain string. A list turns the later entries into
+        fallbacks, used when an earlier voice is neither cached nor obtainable from the API.
+
+        Returns:
+            Voice names or IDs, blanks dropped
+        """
+        voices = self.config.get("elevenlabs", {}).get("voice_id", "Bratanek")
+        if not isinstance(voices, list):
+            voices = [voices]
+        return [str(voice).strip() for voice in voices if str(voice).strip()]
 
     def get_elevenlabs_model_id(self) -> str:
         """Get model ID from config"""
@@ -144,6 +156,10 @@ class ConfigManager():
     def get_speech_offset_ms(self) -> int:
         """Get the offset in milliseconds for when to start speech after chime"""
         return self.config.get("audio", {}).get("speech_offset_ms", 1000)
+
+    def is_cache_enabled(self) -> bool:
+        """Check if announcements should be read from and written to the cache"""
+        return self.config.get("cache", {}).get("enabled", True)
 
     def get_cache_directory(self) -> str:
         """Get the cache directory path"""
