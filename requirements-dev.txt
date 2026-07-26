@@ -1,2 +1,0 @@
-# Dev dependencies are declared in pyproject.toml ([project.optional-dependencies]).
--e .[dev]

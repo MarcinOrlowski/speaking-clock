@@ -1,2 +1,0 @@
-# Runtime dependencies are declared in pyproject.toml ([project.dependencies]).
--e .

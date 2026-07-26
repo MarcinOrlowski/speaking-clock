@@ -3,25 +3,36 @@ language:
   use_24h_clock: true
 
 elevenlabs:
-  api_key: "<YOUR API KEY>"  # Your ElevenLabs API key
-  # Voice name or ID from your ElevenLabs account. Give a list to set up fallbacks:
+  # To get your ElevenLabs API key, loging to your account and go to
+  #   https://elevenlabs.io/app/developers/api-keys
+  #
+  # Then create new key. Make sure the following endpoint access is granted:
+  # - Text so Speed: Acesss
+  # - Voices: Read
+  #
+  api_key: "<YOUR API KEY>"
+
+  # Voice name or ID from your ElevenLabs account. Give a list to set up fallbacks
+  # if needed (see docs for details):
   # voice_id:
   #   - "<PREFERRED VOICE>"
   #   - "<FALLBACK VOICE>"
+  #
   voice_id: "<VOICE NAME OR ID>"
   model_id: "eleven_multilingual_v2"
 
 audio:
-  overlay_speech: true  # Set to true to overlay speech over the chime. If false, speech will start after the chime ends
-  speech_offset_ms: 1000  # Milliseconds to wait before starting speech after chime starts
-  volume: 1.0  # Volume level from 0.0 to 1.0
+  overlay_speech: true           # Set to true to overlay speech over the chime.
+                                 # If false, speech will start after the chime ends
+  speech_offset_ms: 1000         # Milliseconds to wait before starting speech after chime plays
+  volume: 1.0                    # Volume level from 0.0 (muted) to 1.0 (full)
 
 chime:
   enabled: true  # Set to true to play a chime before speaking the time
   audio_file: "clock-chime.mp3"  # Path to the chime audio file
 
 cache:
-  enabled: true  # Set to false to always generate speech instead of reusing cached files
-  # Defaults to $XDG_CACHE_HOME/speaking-clock, or ~/.cache/speaking-clock when
-  # XDG_CACHE_HOME is unset. Uncomment to override.
+  enabled: true                  # Set to false to always generate speech instead of reusing cache
+
+  # Defaults to "$XDG_CACHE_HOME/speaking-clock/", or "~/.cache/speaking-clock/"
   # directory: "~/.cache/speaking-clock"

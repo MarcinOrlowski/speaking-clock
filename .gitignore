@@ -4,8 +4,6 @@
 *.bak
 *.swp
 
-/*.sh
-
 /.venv/
 
 # IDEA
@@ -100,5 +98,3 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-upd.sh
-testfiles

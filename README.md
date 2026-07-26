@@ -49,23 +49,44 @@ You can create a config file at `~/.config/speaking-clock/config.yml` with the f
 
 ```yaml
 language:
-  code: "pl"                          # Language code matching a file in 'languages/' directory
-  use_24h_clock: true                 # Use 24-hour (true) or 12-hour (false) format
+  code: "pl"
+  use_24h_clock: true
 
 elevenlabs:
-  api_key: "your-api-key-here"        # Your ElevenLabs API key
-  voice_id: "voice-id-here"           # ElevenLabs voice name or ID
-  model_id: "eleven_multilingual_v2"  # TTS model to use
+  # To get your ElevenLabs API key, loging to your account and go to
+  #   https://elevenlabs.io/app/developers/api-keys
+  #
+  # Then create new key. Make sure the following endpoint access is granted:
+  # - Text so Speed: Acesss
+  # - Voices: Read
+  #
+  api_key: "<YOUR API KEY>"
+
+  # Voice name or ID from your ElevenLabs account. Give a list to set up fallbacks
+  # if needed (see docs for details):
+  # voice_id:
+  #   - "<PREFERRED VOICE>"
+  #   - "<FALLBACK VOICE>"
+  #
+  voice_id: "<VOICE NAME OR ID>"
+  model_id: "eleven_multilingual_v2"
 
 audio:
-  play_chime: true                    # Play a chime before speaking the time
-  chime_file: "clock-chime.mp3"       # Path to the chime audio file
-  overlay_speech: true                # Overlay speech over the chime sound
-  speech_offset_ms: 1000              # Milliseconds to wait before starting speech
+  overlay_speech: true           # Set to true to overlay speech over the chime.
+                                 # If false, speech will start after the chime ends
+  speech_offset_ms: 1000         # Milliseconds to wait before starting speech after chime plays
+  volume: 1.0                    # Volume level from 0.0 (muted) to 1.0 (full)
+
+chime:
+  enabled: true  # Set to true to play a chime before speaking the time
+  audio_file: "clock-chime.mp3"  # Path to the chime audio file
 
 cache:
-  enabled: true                       # Read and write cached announcements
-  directory: "~/.cache/speaking-clock"  # Optional. Overrides the XDG default location
+  enabled: true                  # Set to false to always generate speech instead of reusing cache
+
+  # Defaults to "$XDG_CACHE_HOME/speaking-clock/", or "~/.cache/speaking-clock/"
+  # directory: "~/.cache/speaking-clock"
+
 ```
 
 #### Voice fallbacks
