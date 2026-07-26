@@ -9,15 +9,15 @@ use [pipx](https://pipx.pypa.io/) to install this tool in isolated environment b
 Windows or MacOS machines. Once you got `pipx` up and running, install the package:
 
 ```bash
-$ pipx install speaking-clock
+pipx install speaking-clock
 ```
 
 ## Usage
 
-Once installed, you can use the command-line interface:
+Once installed, you can call the clock as `speak-time` or `speaking-clock` executable:
 
 ```bash
-$ speak-time
+speak-time
 ```
 
 ### Configuration
