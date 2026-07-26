@@ -1,5 +1,2 @@
--r requirements.txt
-twine
-wheel
-build
-wemake-python-styleguide
+# Dev dependencies are declared in pyproject.toml ([project.optional-dependencies]).
+-e .[dev]

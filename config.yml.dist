@@ -4,7 +4,11 @@ language:
 
 elevenlabs:
   api_key: "<YOUR API KEY>"  # Your ElevenLabs API key
-  voice_id: "<VOICE NAME OR ID>"   # Replace with a valid voice ID from your ElevenLabs account
+  # Voice name or ID from your ElevenLabs account. Give a list to set up fallbacks:
+  # voice_id:
+  #   - "<PREFERRED VOICE>"
+  #   - "<FALLBACK VOICE>"
+  voice_id: "<VOICE NAME OR ID>"
   model_id: "eleven_multilingual_v2"
 
 audio:
@@ -15,3 +19,9 @@ audio:
 chime:
   enabled: true  # Set to true to play a chime before speaking the time
   audio_file: "clock-chime.mp3"  # Path to the chime audio file
+
+cache:
+  enabled: true  # Set to false to always generate speech instead of reusing cached files
+  # Defaults to $XDG_CACHE_HOME/speaking-clock, or ~/.cache/speaking-clock when
+  # XDG_CACHE_HOME is unset. Uncomment to override.
+  # directory: "~/.cache/speaking-clock"
