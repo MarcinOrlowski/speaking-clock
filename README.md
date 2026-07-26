@@ -106,6 +106,9 @@ behind a paid tier, say - keeps playing back whatever was cached while it still 
 announcements it never cached come from the next voice in the list. The run fails only when
 every voice misses both its cache and the API.
 
+Whatever the skipped voices had to say - an API error, an unknown voice name - stays quiet as
+long as a later voice delivers, and is reported only when the whole list comes up empty.
+
 You can also set your ElevenLabs API key as an environment variable:
 
 ```bash
