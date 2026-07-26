@@ -1,6 +1,6 @@
 # Changes
 
-## v1.1.0 (TBD)
+## v1.1.0 (2026-07-26)
 
 * Fixed speech generation failing against ElevenLabs SDK 2.x.
 * Fixed audio playback crashing with `'module' object is not callable` on ElevenLabs SDK 2.x.
