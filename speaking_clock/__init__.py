@@ -6,11 +6,22 @@ using ElevenLabs API and caches audio for reuse
 from .clock import SpeakingClock
 from .config import ConfigManager
 from .audio import AudioCache
+from .const import Const
 from .utils.number_converter import PolishTimeFormatter, PolishNumberConverter
 
-__version__ = "0.1.0"
-__author__ = "Carlos"
-__email__ = "carlos@example.com"
+__version__ = Const.APP_VERSION
+__author__ = "Marcin Orlowski"
+__email__ = "mail@marcinorlowski.com"
+
+__all__ = [
+    "AudioCache",
+    "ConfigManager",
+    "PolishNumberConverter",
+    "PolishTimeFormatter",
+    "SpeakingClock",
+    "speak_time",
+]
+
 
 # Expose main function for easy imports
 def speak_time():

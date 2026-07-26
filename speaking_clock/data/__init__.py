@@ -3,7 +3,6 @@ Data package for speaking-clock
 """
 
 import os
-import importlib.resources as pkg_resources
 
 # Define paths to data files relative to this package
 DATA_DIR = os.path.dirname(__file__)

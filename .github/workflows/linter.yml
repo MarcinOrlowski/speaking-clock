@@ -47,4 +47,4 @@ jobs:
       - name: "Linting..."
         if: steps.filter.outputs.srcs == 'true'
         run: |
-          flake8 --config .flake8 src/ tests/
+          flake8

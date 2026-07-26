@@ -7,7 +7,7 @@ name = "speaking-clock"
 version = "1.0.0"
 description = "A clock that speaks the current time using ElevenLabs API"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = {text = "MIT"}
 authors = [
     {name = "Marcin Orlowski", email = "mail@marcinorlowski.com"}
@@ -17,12 +17,28 @@ dependencies = [
     "PyYAML",
     "python-dateutil",
     "num2words",
+    "pydub",
+    "numpy",
+    # pydub imports the stdlib `audioop` module, removed in Python 3.13 (PEP 594).
+    # Without this shim pydub fails to import and volume control silently degrades.
+    "audioop-lts; python_version >= '3.13'",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "build",
+    "twine",
+    "wheel",
+    "wemake-python-styleguide",
+]
+
+[project.urls]
+Homepage = "https://github.com/MarcinOrlowski/speaking-clock"
 
 [project.scripts]
 speaking-clock = "speaking_clock.cli:main"

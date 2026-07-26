@@ -1,4 +1,4 @@
-```
+```ascii
  ▄▀▀▄                █     ▀                ▄▀▀▄ ▀█            █
  ▀▄▄  █▀▀▄ ▄▀▀▄ ▄▀▀▄ █ ▄▀ ▀█  █▀▀▄ ▄▀▀█     █     █  ▄▀▀▄ ▄▀▀▄ █ ▄▀
     █ █  █ █▀▀   ▄▄█ █▀▄   █  █  █ █  █     █     █  █  █ █    █▀▄
@@ -79,7 +79,7 @@ cache:
 
 You can also set your ElevenLabs API key as an environment variable:
 
-```
+```bash
 export ELEVENLABS_API_KEY="your-api-key-here"
 ```
 
@@ -93,7 +93,9 @@ $ speak-time --config /path/to/your/config.yml
 
 ## Language Support
 
-The application supports multiple languages through YAML language definition files. These files are stored in the `languages/` directory with filenames matching their language code (e.g., `pl.yml` for Polish).
+The application supports multiple languages through YAML language definition files. These files are
+stored in the `languages/` directory with filenames matching their language code (e.g., `pl.yml`
+for Polish).
 
 To add support for a new language:
 
@@ -137,13 +139,16 @@ For example:
 pl-voice_id-13-05.mp3  # Polish, voice_id, 13:05
 ```
 
-This caching system ensures that each unique time announcement is only generated once, reducing API calls to ElevenLabs and improving response time for frequently requested times.
+This caching system ensures that each unique time announcement is only generated once, reducing API
+calls to ElevenLabs and improving response time for frequently requested times.
 
 # Audio Support for Cron Jobs in KDE 5
 
 ## Problem
 
-When running Python applications from cron jobs in KDE 5, audio playback doesn't work automatically. This is because cron jobs run in a separate environment without access to your desktop session's audio system.
+When running Python applications from cron jobs in KDE 5, audio playback doesn't work automatically.
+This is because cron jobs run in a separate environment without access to your desktop session's
+audio system.
 
 ## Solution
 
@@ -167,10 +172,14 @@ crontab -e
 
 Add your job using this template:
 
+<!-- markdownlint-disable MD013 -- a crontab entry must be a single line; cron has no line continuation -->
+
 ```bash
 # Run every hour at minute 0
 0 * * * * DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$(pgrep -u $LOGNAME plasma-session)/environ | cut -d= -f2-) XDG_RUNTIME_DIR=/run/user/$(id -u) python /path/to/your/script.py
 ```
+
+<!-- markdownlint-enable MD013 -->
 
 ### Testing Your Configuration
 
@@ -178,7 +187,11 @@ To test without waiting for the scheduled time:
 
 ```bash
 # Test the exact command that cron will run
-DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$(pgrep -u $LOGNAME plasma-session)/environ | cut -d= -f2-) XDG_RUNTIME_DIR=/run/user/$(id -u) python /path/to/your/script.py
+DISPLAY=:0 \
+  DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS \
+    /proc/$(pgrep -u $LOGNAME plasma-session)/environ | cut -d= -f2-) \
+  XDG_RUNTIME_DIR=/run/user/$(id -u) \
+  python /path/to/your/script.py
 ```
 
 ## Troubleshooting

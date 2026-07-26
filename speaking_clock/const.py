@@ -16,24 +16,38 @@
 ##################################################################################
 """
 
-from enum import Enum
+import re
+from importlib.metadata import PackageNotFoundError, version as _distribution_version
+from pathlib import Path
 from typing import List
 
+# The version lives in pyproject.toml and nowhere else. Installed builds read it back from
+# the distribution metadata; source checkouts (python -m speaking_clock.cli) fall back to
+# parsing pyproject.toml, which sits one level above this package.
+_PYPROJECT_VERSION_RE = re.compile(r'^version\s*=\s*["\']([^"\']+)["\']', re.MULTILINE)
 
-class Version(Enum):
-    MAJOR = 1
-    MINOR = 0
-    PATCH = 0
 
-    @classmethod
-    def as_string(cls) -> str:
-        return f"{cls.MAJOR.value}.{cls.MINOR.value}.{cls.PATCH.value}"
+def _version_from_pyproject() -> str:
+    pyproject = Path(__file__).resolve().parent.parent / 'pyproject.toml'
+    try:
+        content = pyproject.read_text(encoding='utf-8')
+    except OSError:
+        return 'unknown'
+    match = _PYPROJECT_VERSION_RE.search(content)
+    return match.group(1) if match else 'unknown'
+
+
+def _resolve_version() -> str:
+    try:
+        return _distribution_version('speaking-clock')
+    except PackageNotFoundError:
+        return _version_from_pyproject()
 
 
 class Const(object):
     APP_NAME: str = 'Speaking Clock'
     APP_PROJECT_NAME: str = 'Speaking Clock'
-    APP_VERSION: str = Version.as_string()
+    APP_VERSION: str = _resolve_version()
     APP_URL: str = 'https://github.com/MarcinOrlowski/speaking-clock/'
     APP_DESCRIPTION: str = 'Tells current time using ElevenLabs Text To Speach API',
     APP_YEAR: int = 2025
