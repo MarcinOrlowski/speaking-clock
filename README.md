@@ -209,19 +209,14 @@ For audio playback in KDE 5, your cron job needs these key environment variables
 
 ### Setting Up the Cron Job
 
-Edit your crontab:
-
-```bash
-crontab -e
-```
-
-Add your job using this template:
+Edit your crontab and add your job using this template (it's assumed app is
+installed via `pipx` so its binary sits in `~/.local/bin/` folder):
 
 <!-- markdownlint-disable MD013 -- a crontab entry must be a single line; cron has no line continuation -->
 
 ```bash
 # Run every hour at minute 0
-0 * * * * DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$(pgrep -u $LOGNAME plasma-session)/environ | cut -d= -f2-) XDG_RUNTIME_DIR=/run/user/$(id -u) speak-time
+0 * * * * DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$(pgrep -u $LOGNAME plasma-session)/environ | cut -d= -f2-) XDG_RUNTIME_DIR=/run/user/$(id -u) .local/bin/speak-time
 ```
 
 <!-- markdownlint-enable MD013 -->
@@ -236,7 +231,7 @@ DISPLAY=:0 \
   DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS \
     /proc/$(pgrep -u $LOGNAME plasma-session)/environ | cut -d= -f2-) \
   XDG_RUNTIME_DIR=/run/user/$(id -u) \
-  speak-time
+  .local/bin/speak-time
 ```
 
 ## Troubleshooting
