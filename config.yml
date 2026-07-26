@@ -17,6 +17,6 @@ chime:
   audio_file: "clock-chime.mp3"  # Path to the chime audio file
 
 cache:
-  # Using the default location ~/.cache/SpeakingClock
+  # Using the default location $XDG_CACHE_HOME/speaking-clock (~/.cache/speaking-clock)
   # Uncomment the line below to override
-  # directory: "~/.cache/SpeakingClock"
+  # directory: "~/.cache/speaking-clock"

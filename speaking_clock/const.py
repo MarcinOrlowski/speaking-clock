@@ -16,6 +16,7 @@
 ##################################################################################
 """
 
+import os
 import re
 from importlib.metadata import PackageNotFoundError, version as _distribution_version
 from pathlib import Path
@@ -44,6 +45,23 @@ def _resolve_version() -> str:
         return _version_from_pyproject()
 
 
+def xdg_cache_home() -> Path:
+    """Base directory for user cache data, per XDG Base Directory Specification.
+
+    Honours $XDG_CACHE_HOME when it holds an absolute path, otherwise falls back to
+    ~/.cache as the specification mandates for unset, empty or relative values.
+    """
+    env_value = os.environ.get('XDG_CACHE_HOME', '')
+    if env_value and os.path.isabs(env_value):
+        return Path(env_value)
+    return Path.home() / '.cache'
+
+
+def default_cache_dir() -> str:
+    """Default location of the generated audio cache"""
+    return str(xdg_cache_home() / 'speaking-clock')
+
+
 class Const(object):
     APP_NAME: str = 'Speaking Clock'
     APP_PROJECT_NAME: str = 'Speaking Clock'
@@ -53,7 +71,7 @@ class Const(object):
     APP_YEAR: int = 2025
 
     DEFAULT_CONFIG_PATH: str = "~/.config/speaking-clock/config.yml"
-    DEFAULT_CACHE_DIR: str = "~/.cache/speaking-clock"
+    DEFAULT_CACHE_DIR: str = default_cache_dir()
 
     APP_DESCRIPTION: List[str] = [
         f'{APP_NAME} v{APP_VERSION} * Copyright {APP_YEAR} by Marcin Orlowski.',

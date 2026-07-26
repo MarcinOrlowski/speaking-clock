@@ -2,6 +2,8 @@
 
 ## v1.1.0 (TBD)
 
+* Default audio cache location now honours `$XDG_CACHE_HOME` (falling back to `~/.cache/speaking-clock`).
+* Fixed `--cache` being parsed but ignored.
 * Fixed speech generation failing against ElevenLabs SDK 2.x.
 * Fixed audio playback crashing with `'module' object is not callable` on ElevenLabs SDK 2.x.
 * ElevenLabs API errors now report just the message instead of dumping every HTTP header.
