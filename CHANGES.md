@@ -5,9 +5,8 @@
 * Fixed speech generation failing against ElevenLabs SDK 2.x.
 * Fixed audio playback crashing with `'module' object is not callable` on ElevenLabs SDK 2.x.
 * ElevenLabs API errors now report just the message instead of dumping every HTTP header.
-* `voice_id` now accepts a voice name, so it resolves without needing its full form or ID.
-* `voice_id` now accepts a list of voices, each one a fallback for when the previous is
-  neither cached nor available from the API.
+* The `voice_id` now accepts a voice name along voice ID.
+* The `voice_id` accepts multiple voices and use them as fallback if previous is not available.
 * Fixed `--chime` and `--no-chime` having no effect.
 * Fixed volume control being a silent no-op on Python 3.13+
 * Fixed `pydub` and `numpy` missing from the installed package's dependencies.
