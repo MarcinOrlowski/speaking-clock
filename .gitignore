@@ -6,13 +6,6 @@
 
 /*.sh
 
-
-
-# Linters
-/.flake8
-/.markdownlint.yml
-/.pre-commit-config.yaml
-/venv/
 /.venv/
 
 # IDEA
