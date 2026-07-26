@@ -221,7 +221,7 @@ Add your job using this template:
 
 ```bash
 # Run every hour at minute 0
-0 * * * * DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$(pgrep -u $LOGNAME plasma-session)/environ | cut -d= -f2-) XDG_RUNTIME_DIR=/run/user/$(id -u) python /path/to/your/script.py
+0 * * * * DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$(pgrep -u $LOGNAME plasma-session)/environ | cut -d= -f2-) XDG_RUNTIME_DIR=/run/user/$(id -u) speak-time
 ```
 
 <!-- markdownlint-enable MD013 -->
@@ -236,7 +236,7 @@ DISPLAY=:0 \
   DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS \
     /proc/$(pgrep -u $LOGNAME plasma-session)/environ | cut -d= -f2-) \
   XDG_RUNTIME_DIR=/run/user/$(id -u) \
-  python /path/to/your/script.py
+  speak-time
 ```
 
 ## Troubleshooting
