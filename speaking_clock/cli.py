@@ -65,11 +65,11 @@ def main():
     # Create a mutually exclusive group for chime options
     chime_group = parser.add_mutually_exclusive_group()
     chime_group.add_argument("--chime",
-                            action='store_true',
-                            help='Enable the chime sound (overrides config file)')
+                             action='store_true',
+                             help='Enable the chime sound (overrides config file)')
     chime_group.add_argument("--no-chime",
-                            action='store_true',
-                            help='Disable the chime sound (overrides config file)')
+                             action='store_true',
+                             help='Disable the chime sound (overrides config file)')
     parser.add_argument("--volume", '-v',
                         type=float,
                         help='Set audio volume level (0.0 to 1.0)')

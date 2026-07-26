@@ -27,16 +27,21 @@ from typing import List
 _PYPROJECT_VERSION_RE = re.compile(r'^version\s*=\s*["\']([^"\']+)["\']', re.MULTILINE)
 
 
+def _version_from_pyproject() -> str:
+    pyproject = Path(__file__).resolve().parent.parent / 'pyproject.toml'
+    try:
+        content = pyproject.read_text(encoding='utf-8')
+    except OSError:
+        return 'unknown'
+    match = _PYPROJECT_VERSION_RE.search(content)
+    return match.group(1) if match else 'unknown'
+
+
 def _resolve_version() -> str:
     try:
         return _distribution_version('speaking-clock')
     except PackageNotFoundError:
-        pyproject = Path(__file__).resolve().parent.parent / 'pyproject.toml'
-        try:
-            match = _PYPROJECT_VERSION_RE.search(pyproject.read_text(encoding='utf-8'))
-        except OSError:
-            return 'unknown'
-        return match.group(1) if match else 'unknown'
+        return _version_from_pyproject()
 
 
 class Const(object):

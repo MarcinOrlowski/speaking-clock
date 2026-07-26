@@ -93,7 +93,7 @@ class ConfigManager():
                 return yaml.safe_load(file)
         except (yaml.YAMLError, FileNotFoundError) as e:
             print(f"Notice: Config file not found or invalid at {config_path}: {e}", file=sys.stderr)
-            print(f"Using default configuration", file=sys.stderr)
+            print("Using default configuration", file=sys.stderr)
             return None
 
     def _update_config(self, user_config: Dict[str, Any]) -> None:

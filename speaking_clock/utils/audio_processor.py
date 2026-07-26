@@ -20,7 +20,6 @@ Audio processing utilities for the speaking clock
 
 import io
 import numpy as np
-from typing import Optional
 
 try:
     from pydub import AudioSegment

@@ -102,8 +102,8 @@ class SpeakingClock:
 
         except (ValueError, IndexError) as e:
             if isinstance(e, ValueError) and str(e) in ["Time must be in format HH:MM",
-                                                     "Hour must be between 0 and 23",
-                                                     "Minute must be between 0 and 59"]:
+                                                        "Hour must be between 0 and 23",
+                                                        "Minute must be between 0 and 59"]:
                 raise
             raise ValueError("Time must be in format HH:MM (e.g. 14:30)")
 
