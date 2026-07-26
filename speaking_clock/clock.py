@@ -259,7 +259,8 @@ class SpeakingClock:
         Each voice is tried in full before moving on: its cache first, then the API. That way
         a voice the account can no longer generate with - one that moved behind a paid tier,
         say - still plays back the announcements cached while it was usable, and only a chain
-        where every voice misses both is a failure.
+        where every voice misses both is a failure. With the cache disabled every voice goes
+        straight to the API, and nothing generated is written back.
 
         Args:
             text: Text to convert to speech
@@ -274,8 +275,10 @@ class SpeakingClock:
             print("*** Error: No voice configured in 'elevenlabs.voice_id'", file=sys.stderr)
             return None
 
+        cache_enabled = self.config.is_cache_enabled()
+
         for index, voice in enumerate(voices):
-            cached_path = self.cache.get_cached_audio(voice, hour, minute)
+            cached_path = self.cache.get_cached_audio(voice, hour, minute) if cache_enabled else None
             if cached_path:
                 try:
                     return cached_path.read_bytes()
@@ -285,7 +288,8 @@ class SpeakingClock:
 
             audio_data = self.generate_speech(text, voice)
             if audio_data is not None:
-                self.cache.save_audio(audio_data, voice, hour, minute)
+                if cache_enabled:
+                    self.cache.save_audio(audio_data, voice, hour, minute)
                 return audio_data
 
             if index + 1 < len(voices):

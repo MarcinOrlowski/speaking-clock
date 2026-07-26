@@ -40,6 +40,9 @@ Examples:
     # Set audio volume (0.0 to 1.0)
     speak-time --volume 0.5
 
+    # Bypass the cache entirely (no read, no write)
+    speak-time --no-cache
+
     # Combine options
     speak-time -t 08:15 --no-chime --volume 0.8
 """
@@ -56,7 +59,11 @@ def main():
     parser = argparse.ArgumentParser(description="Speaking Clock")
     parser.add_argument("--cache",
                         default=None,
+                        metavar='DIR',
                         help=f'Location of file cache. Default: {Const.DEFAULT_CACHE_DIR}')
+    parser.add_argument("--no-cache",
+                        action='store_true',
+                        help='Neither read nor write cached announcements for this run')
     parser.add_argument("--config", '-c',
                         default=Const.DEFAULT_CONFIG_PATH,
                         help='Configuration file path. Default: %(default)s')
@@ -83,8 +90,13 @@ def main():
         config_overrides['chime'] = {'enabled': False}
 
     # Only override when given, so the config file keeps precedence over the built-in default
+    cache_overrides = {}
     if args.cache is not None:
-        config_overrides['cache'] = {'directory': args.cache}
+        cache_overrides['directory'] = args.cache
+    if args.no_cache:
+        cache_overrides['enabled'] = False
+    if cache_overrides:
+        config_overrides['cache'] = cache_overrides
 
     # Add volume override if provided
     if args.volume is not None:

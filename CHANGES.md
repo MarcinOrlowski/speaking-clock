@@ -11,7 +11,9 @@
 * Fixed volume control being a silent no-op on Python 3.13+
 * Fixed `pydub` and `numpy` missing from the installed package's dependencies.
 * Consolidated packaging metadata into `pyproject.toml`
+* Added `--no-cache` and `cache.enabled` to skip both reading and writing cached announcements.
 * Default audio cache location now honours `$XDG_CACHE_HOME`.
+* Cache directory is now created on first write instead of on every run.
 * Fixed `--cache` being parsed but ignored.
 * Raised the declared minimum Python from 3.7 to 3.8.
 
