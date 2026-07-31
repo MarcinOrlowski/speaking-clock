@@ -3,6 +3,7 @@
 ## v1.2.0 (TBD)
 
 - Every command line option now has a short form.
+- Fixed the audio cache serving stale announcements.
 - Errors from voices are no longer printed unless at no voice yields any audio.
 - Updated documentation.
 

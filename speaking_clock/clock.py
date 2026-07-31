@@ -328,14 +328,15 @@ class SpeakingClock:
         cache_enabled = self.config.is_cache_enabled()
 
         for index, voice in enumerate(voices):
-            cached_audio = self.load_cached_audio(voice, hour, minute) if cache_enabled else None
+            cached_audio = (self.load_cached_audio(voice, hour, minute, text)
+                            if cache_enabled else None)
             if cached_audio is not None:
                 return cached_audio
 
             audio_data = self.generate_speech(text, voice)
             if audio_data is not None:
                 if cache_enabled:
-                    self.cache.save_audio(audio_data, voice, hour, minute)
+                    self.cache.save_audio(audio_data, voice, hour, minute, text)
                 return audio_data
 
             if index + 1 < len(voices):
@@ -344,7 +345,8 @@ class SpeakingClock:
 
         return None
 
-    def load_cached_audio(self, voice: str, hour: int, minute: int) -> Optional[bytes]:
+    def load_cached_audio(self, voice: str, hour: int, minute: int,
+                          text: str) -> Optional[bytes]:
         """
         Read the cached announcement for a voice, if there is a readable one
 
@@ -352,11 +354,12 @@ class SpeakingClock:
             voice: Voice ID or name the announcement was generated with
             hour: Hour the announcement is for, as used in the cache key
             minute: Minute the announcement is for, as used in the cache key
+            text: The announcement text, as used in the cache key
 
         Returns:
             Cached audio data as bytes, or None if it is missing or unreadable
         """
-        cached_path = self.cache.get_cached_audio(voice, hour, minute)
+        cached_path = self.cache.get_cached_audio(voice, hour, minute, text)
         if not cached_path:
             return None
 

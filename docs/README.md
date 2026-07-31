@@ -172,17 +172,23 @@ Audio files are automatically cached in `$XDG_CACHE_HOME/speaking-clock`, fallin
 Cached files follow the naming convention:
 
 ```ascii
-LANG-VOICE-HH-MM.mp3
+LANG-VOICE-HH-MM-DIGEST.mp3
 ```
 
 For example:
 
 ```ascii
-pl-voice_id-13-05.mp3  # Polish, voice_id, 13:05
+pl-voice_id-13-05-ba6dcd8a.mp3  # Polish, voice_id, 13:05
 ```
 
 This caching system ensures that each unique time announcement is only generated once, reducing API
 calls to ElevenLabs and improving response time for frequently requested times.
+
+`DIGEST` is a short hash of the spoken text. The time alone does not always decide the wording -
+midnight is announced with the name of the day, so it sounds different from one day to the next -
+and hashing the text gives each of those wordings its own entry instead of letting the first one
+generated be replayed ever after. It also means that editing a language file retires the audio it
+no longer matches, rather than leaving the old recording to be served.
 
 Pass `--no-cache` to bypass the cache for a single run - the announcement is then generated fresh
 and is not written to disk:
