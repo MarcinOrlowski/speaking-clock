@@ -1,6 +1,6 @@
 # Changes
 
-## v1.2.0 (TBD)
+## v1.2.0 (2026-07-01)
 
 - Every command line option now has a short form.
 - Fixed the audio cache serving stale announcements.
