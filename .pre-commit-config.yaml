@@ -62,7 +62,7 @@ repos:
         args: [ '--exclude=SC2148' ]
 
   - repo: https://github.com/MarcinOrlowski/pre-commit-hooks
-    rev: 1.6.0
+    rev: 1.7.0
     hooks:
       - id: no-ai-slop
       - id: branch-name
