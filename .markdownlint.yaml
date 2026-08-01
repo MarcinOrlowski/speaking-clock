@@ -1,4 +1,4 @@
-##################################################################################
+####################################################################################
 #
 # ▄▀▀▄                █     ▀                ▄▀▀▄ ▀█            █
 # ▀▄▄  █▀▀▄ ▄▀▀▄ ▄▀▀▄ █ ▄▀ ▀█  █▀▀▄ ▄▀▀█     █     █  ▄▀▀▄ ▄▀▀▄ █ ▄▀
@@ -7,12 +7,10 @@
 #      █                             ▄▄▀
 #
 # @project   Speaking Clock - time announcer using ElevenLabs TTS API
-# @author    Marcin Orlowski <mail (#) marcinOrlowski (.) com>
-# @copyright 2025 Marcin Orlowski
-# @license   https://www.opensource.org/licenses/mit-license.php MIT
+# @copyright 2025-2026 Marcin Orlowski
 # @link      https://github.com/MarcinOrlowski/speaking-clock
 #
-##################################################################################
+####################################################################################
 
 # Modified markdownlint YAML configuration
 # Changes from defaults annotated with "# MOR"
